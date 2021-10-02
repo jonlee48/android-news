@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
             // Create intent to open activity
             val intent: Intent = Intent( this, SourceActivity::class.java)
-            intent.putExtra("LOCATION", inputtedTerm)
+            intent.putExtra("TERM", inputtedTerm)
 
             startActivity(intent)
         }
