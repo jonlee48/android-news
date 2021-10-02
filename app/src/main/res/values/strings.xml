@@ -10,4 +10,5 @@
     <string name="category_title">Category</string>
     <string name="sources_title">Sources</string>
     <string name="skip_button">Skip (search all sources)</string>
+    <string name="source_title">Search for %1$s</string>
 </resources>
