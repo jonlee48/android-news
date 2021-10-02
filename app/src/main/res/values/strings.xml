@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Android News</string>
+    <string name="search_title">Term Search</string>
+    <string name="search_input">Search</string>
+    <string name="search_button">Search</string>
+    <string name="map_title">News by Location</string>
+    <string name="map_button">View Map</string>
+    <string name="headlines_title">Top Headlines</string>
+    <string name="headlines_button">View Top Headlines</string>
+    <string name="category_title">Category</string>
+    <string name="sources_title">Sources</string>
+    <string name="skip_button">Skip (search all sources)</string>
+    <string name="source_title">Search for %1$s</string>
+</resources>
