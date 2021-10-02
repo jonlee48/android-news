@@ -7,4 +7,7 @@
     <string name="map_button">View Map</string>
     <string name="headlines_title">Top Headlines</string>
     <string name="headlines_button">View Top Headlines</string>
+    <string name="category_title">Category</string>
+    <string name="sources_title">Sources</string>
+    <string name="skip_button">Skip (search all sources)</string>
 </resources>
