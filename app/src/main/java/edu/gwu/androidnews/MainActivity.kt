@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
             editor.apply()
 
             Log.d("MainActivity", "Search Button Clicked")
-            progressBar.visibility = View.VISIBLE
 
             // Create intent to open activity
             val intent: Intent = Intent( this, SourceActivity::class.java)
@@ -60,7 +59,20 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
+
+        // Set button on-click listener
+        mapButton.setOnClickListener {
+            Log.d("MainActivity", "Map Button Clicked")
+
+            // Create intent to open activity
+            val intent: Intent = Intent( this, MapsActivity::class.java)
+            //intent.putExtra("TERM", inputtedTerm)
+
+            startActivity(intent)
+        }
+
         searchTerm.addTextChangedListener(textWatcher)
+
     }
 
     private val textWatcher: TextWatcher = object: TextWatcher {
