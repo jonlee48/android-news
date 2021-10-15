@@ -25,7 +25,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var confirm: MaterialButton
     private var currentAddress: Address? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,9 +52,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun updateCurrentAddress(address: Address) {
         currentAddress = address
-        confirm.text = address.getAddressLine(0)
-
-        confirm.setBackgroundColor(getColor(R.color.buttonGreen))
+        setTitle(address.getAddressLine(0))
     }
 
     /**
