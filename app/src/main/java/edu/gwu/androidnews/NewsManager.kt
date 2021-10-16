@@ -66,4 +66,38 @@ class NewsManager {
 
         return articles
     }
+
+    fun retrieveSources(apiKey: String, category: String): List<Source> {
+        val sources: MutableList<Source> = mutableListOf()
+
+        val request: Request = Request.Builder()
+            .url("https://newsapi.org/v2/top-headlines/sources?category=$category&apiKey=$apiKey")
+            .build()
+        Log.d("MapsActivity", "set get https request")
+
+        val response: Response = okHttpClient.newCall(request).execute()
+        val responseBody: String? = response.body?.string()
+
+        if (response.isSuccessful && !responseBody.isNullOrBlank()) {
+            Log.d("SourceActivity", "Successful response")
+            val json = JSONObject(responseBody)
+            val sourcesArr: JSONArray = json.getJSONArray("sources")
+
+            for (i in 0 until sourcesArr.length()) {
+                val curr: JSONObject = sourcesArr.getJSONObject(i)
+
+                val name: String = curr.getString("name")
+                val description: String = curr.getString("description")
+
+                val source = Source(
+                    name = name,
+                    description = description
+                )
+
+                sources.add(source)
+            }
+        }
+
+        return sources
+    }
 }

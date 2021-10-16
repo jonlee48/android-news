@@ -17,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.button.MaterialButton
 import edu.gwu.androidnews.databinding.ActivityMapsBinding
 import org.jetbrains.anko.doAsync
 
@@ -46,20 +45,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener 
         mapFragment.getMapAsync(this)
 
         setTitle(R.string.map_title)
-
-        /*
-        val articles: List<Article> = getFakeArticles()
-        //val articles: List<Article> = listOf<Article>()
-        recyclerView = findViewById(R.id.recycler_view)
-
-        // Sets scrolling direction to vertical
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        val adapter: ArticlesAdapter = ArticlesAdapter(articles)
-        recyclerView.adapter = adapter
-         */
-
-
     }
 
 
@@ -82,7 +67,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener 
             // and has the potential to cause the app to freeze (Application Not Responding error)
             // if done on the UI Thread and it takes too long.
             doAsync {
-                val geocoder: Geocoder = Geocoder(this@MapsActivity)
+                val geocoder = Geocoder(this@MapsActivity)
 
                 // In Kotlin, you can assign the result of a try-catch block. Both the "try" and
                 // "catch" clauses need to yield a valid value to assign.
@@ -136,7 +121,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener 
                     }
 
                     doAsync {
-                        val newsManager: NewsManager = NewsManager()
+                        val newsManager = NewsManager()
 
                         // make call to news API
                         val apiKey = getString(R.string.news_api_key)
@@ -145,95 +130,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener 
 
                         runOnUiThread {
 
-                            //val articles: List<Article> = getFakeArticles()
-                            recyclerView = findViewById(R.id.recycler_view)
+                            recyclerView = findViewById(R.id.maps_recycler_view)
 
                             // Sets scrolling direction to vertical
                             recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity)
 
-                            val adapter: ArticlesAdapter = ArticlesAdapter(this@MapsActivity, articles, this@MapsActivity)
+                            val adapter = ArticlesAdapter(this@MapsActivity, articles, this@MapsActivity)
                             recyclerView.adapter = adapter
                         }
                     }
-
                 }
             }
-
         }
-    }
-
-    fun getFakeArticles(): List<Article> {
-        return listOf(
-            Article(
-                title = "Nick Capurso",
-                source = "@nickcapurso",
-                content = "We're learning lists!",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "Android Central",
-                source = "@androidcentral",
-                content = "NVIDIA Shield TV vs. Shield TV Pro: Which should I buy?",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "DC Android",
-                source = "@DCAndroid",
-                content = "FYI - another great integration for the @Firebase platform",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "KotlinConf",
-                source = "@kotlinconf",
-                content = "Can't make it to KotlinConf this year? We have a surprise for you. We'll be live streaming the keynotes, closing panel and an entire track over the 2 main conference days. Sign-up to get notified once we go live!",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "Android Summit",
-                source = "@androidsummit",
-                content = "What a #Keynote! @SlatteryClaire is the Director of Performance at Speechless, and that's exactly how she left us after her amazing (and interactive!) #keynote at #androidsummit. #DCTech #AndroidDev #Android",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "Fragmented Podcast",
-                source = "@FragmentedCast",
-                content = ".... annnnnnnnnd we're back!\n\nThis week @donnfelker talks about how it's Ok to not know everything and how to set yourself up mentally for JIT (Just In Time [learning]). Listen in here: \nhttp://fragmentedpodcast.com/episodes/135/ ",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "Jake Wharton",
-                source = "@JakeWharton",
-                content = "Free idea: location-aware physical password list inside a password manager. Mostly for garage door codes and the like. I want to open my password app, switch to the non-URL password section, and see a list of things sorted by physical distance to me.",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "Droidcon Boston",
-                source = "@droidconbos",
-                content = "#DroidconBos will be back in Boston next year on April 8-9!",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = "AndroidWeekly",
-                source = "@androidweekly",
-                content = "Latest Android Weekly Issue 327 is out!\nhttp://androidweekly.net/ #latest-issue  #AndroidDev",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            ),
-            Article(
-                title = ".droidconSF",
-                source = "@droidconSF",
-                content = "Drum roll please.. Announcing droidcon SF 2018! November 19-20 @ Mission Bay Conference Center. Content and programming by @tsmith & @joenrv.",
-                iconUrl = "https://....",
-                link = " https://www.gwu.edu/"
-            )
-        )
     }
 }
