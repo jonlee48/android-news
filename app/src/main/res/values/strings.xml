@@ -13,4 +13,5 @@
     <string name="source_title">Search for %1$s</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="geocoder_no_results">No results for location!</string>
+    <string name="map_query_title">Results for %1$s</string>
 </resources>

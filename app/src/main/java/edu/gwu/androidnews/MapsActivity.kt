@@ -26,6 +26,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var recyclerView: RecyclerView
     private lateinit var binding: ActivityMapsBinding
     private var currentAddress: Address? = null
+    private var location: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        setTitle(R.string.map_title)
+
+        /*
         val articles: List<Article> = getFakeArticles()
         //val articles: List<Article> = listOf<Article>()
         recyclerView = findViewById(R.id.recycler_view)
@@ -47,13 +51,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val adapter: ArticlesAdapter = ArticlesAdapter(articles)
         recyclerView.adapter = adapter
+         */
     }
 
-
-    fun updateCurrentAddress(address: Address) {
-        currentAddress = address
-        setTitle(address.getAddressLine(0))
-    }
 
     /**
      * Manipulates the map once available.
@@ -89,7 +89,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     listOf()
                 }
-
                 // Move back to the UI Thread now that we have some results to show.
                 // The UI can only be updated from the UI Thread.
                 runOnUiThread {
@@ -102,7 +101,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         Log.d("MapsActivity", "First result: $postalAddress")
 
-
                         // Add a map marker where the user tapped and pan the camera over
 
                         googleMap.addMarker(
@@ -110,7 +108,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
 
-                        updateCurrentAddress(firstResult)
+                        currentAddress = firstResult
+
+                        if (firstResult.getCountryCode() == "US")
+                            location = firstResult.getAdminArea()
+                        else
+                            location = firstResult.getCountryName()
+
+                        setTitle(getString(R.string.map_query_title, location))
                     } else {
                         Log.d("MapsActivity", "No results from geocoder!")
 
@@ -121,8 +126,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                         toast.show()
                     }
+
+                    doAsync {
+                        val newsManager: NewsManager = NewsManager()
+
+                        // make call to news API
+                        val apiKey = getString(R.string.news_api_key)
+                        Log.d("MapsActivity", "Retrieving articles from $location")
+                        val articles: List<Article> = newsManager.retrieveArticles(apiKey, location)
+
+                        runOnUiThread {
+
+                            //val articles: List<Article> = getFakeArticles()
+                            recyclerView = findViewById(R.id.recycler_view)
+
+                            // Sets scrolling direction to vertical
+                            recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity)
+
+                            val adapter: ArticlesAdapter = ArticlesAdapter(articles)
+                            recyclerView.adapter = adapter
+                        }
+                    }
+
                 }
             }
+
         }
     }
 
