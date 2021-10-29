@@ -1,5 +1,6 @@
 package edu.gwu.androidnews
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class SourceAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
+class SourceAdapter(val context: Context, val sources: List<Source>, val sourceClickListener: SourceClickListener) : RecyclerView.Adapter<SourceAdapter.ViewHolder>() {
     override fun getItemCount(): Int {
         return sources.size
     }
@@ -16,6 +17,10 @@ class SourceAdapter(val sources: List<Source>) : RecyclerView.Adapter<SourceAdap
         val currSource = sources[position]
         holder.name.setText(currSource.name)
         holder.description.setText(currSource.description)
+
+        holder.itemView.setOnClickListener{
+            sourceClickListener.onSourceClickListener(currSource)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

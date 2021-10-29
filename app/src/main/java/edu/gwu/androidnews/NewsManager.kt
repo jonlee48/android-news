@@ -26,7 +26,53 @@ class NewsManager {
     }
 
 
-    fun retrieveArticles(apiKey: String, location: String): List<Article> {
+    fun retrieveArticles(apiKey: String, query: String, source: String = ""): List<Article> {
+        val articles: MutableList<Article> = mutableListOf()
+        var url = ""
+        if (source.isBlank()) {
+            url = "https://newsapi.org/v2/everything?q=$query&apiKey=$apiKey"
+        } else {
+            url = "https://newsapi.org/v2/everything?sources=$source&q=$query&apiKey=$apiKey"
+        }
+        val request: Request = Request.Builder()
+            .url(url)
+            .build()
+
+        val response: Response = okHttpClient.newCall(request).execute()
+        val responseBody: String? = response.body?.string()
+
+        if (response.isSuccessful && !responseBody.isNullOrBlank()) {
+            Log.d("MapsActivity", "Successful response")
+            val json: JSONObject = JSONObject(responseBody)
+            val articlesArr: JSONArray = json.getJSONArray("articles")
+
+            for (i in 0 until articlesArr.length()) {
+                val curr: JSONObject = articlesArr.getJSONObject(i)
+
+                val sourceObj: JSONObject = curr.getJSONObject("source")
+                val source: String = sourceObj.getString("name")
+                val title: String = curr.getString("title")
+                val content: String = curr.getString("description")
+                val iconURL: String = curr.getString("urlToImage")
+                val url: String = curr.getString("url")
+
+                val article: Article = Article(
+                    title = title,
+                    source = source,
+                    content = content,
+                    iconUrl = iconURL,
+                    link = url
+                )
+
+                articles.add(article)
+            }
+        }
+
+        return articles
+    }
+
+
+    fun retrieveArticlesInTitle(apiKey: String, location: String): List<Article> {
         val articles: MutableList<Article> = mutableListOf()
 
         val request: Request = Request.Builder()
@@ -128,10 +174,12 @@ class NewsManager {
 
                 val name: String = curr.getString("name")
                 val description: String = curr.getString("description")
+                val id: String = curr.getString("id")
 
                 val source = Source(
                     name = name,
-                    description = description
+                    description = description,
+                    id =id
                 )
 
                 sources.add(source)

@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-class ArticlesAdapter(val context: Context, val articles: List<Article>, val cellClickListener: CellClickListener) : RecyclerView.Adapter<ArticlesAdapter.ViewHolder>() {
+class ArticlesAdapter(val context: Context, val articles: List<Article>, val articleClickListener: ArticleClickListener) : RecyclerView.Adapter<ArticlesAdapter.ViewHolder>() {
 
     // How many rows (total) do you want the adapter to render?
     override fun getItemCount(): Int {
@@ -48,7 +48,7 @@ class ArticlesAdapter(val context: Context, val articles: List<Article>, val cel
                 .into(viewHolder.icon)
         }
         viewHolder.itemView.setOnClickListener{
-            cellClickListener.onCellClickListener(currArticle)
+            articleClickListener.onArticleClickListener(currArticle)
         }
     }
 

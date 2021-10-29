@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import edu.gwu.androidnews.databinding.ActivityMapsBinding
 import org.jetbrains.anko.doAsync
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ArticleClickListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
@@ -28,7 +28,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener 
     private var currentAddress: Address? = null
     private var location: String = ""
 
-    override fun onCellClickListener(data: Article) {
+    override fun onArticleClickListener(data: Article) {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(data.link))
         startActivity(browserIntent)
     }
@@ -126,7 +126,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, CellClickListener 
                         // make call to news API
                         val apiKey = getString(R.string.news_api_key)
                         Log.d("MapsActivity", "Retrieving articles from $location")
-                        val articles: List<Article> = newsManager.retrieveArticles(apiKey, location)
+                        val articles: List<Article> = newsManager.retrieveArticlesInTitle(apiKey, location)
 
                         runOnUiThread {
 

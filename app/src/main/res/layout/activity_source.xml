@@ -42,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <Button
-        android:id="@+id/next_button"
+        android:id="@+id/skip_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -53,11 +53,11 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sources_recycler_viewer"
+        android:id="@+id/results_recycler_viewer"
         android:layout_width="359dp"
         android:layout_height="436dp"
         android:layout_marginTop="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/next_button"
+        app:layout_constraintBottom_toTopOf="@+id/skip_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headlines_results" />

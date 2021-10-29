@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.jetbrains.anko.doAsync
 
-class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener, CellClickListener {
+class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener, ArticleClickListener {
 
     private lateinit var spinner: Spinner
     private lateinit var recyclerView: RecyclerView
@@ -34,7 +34,7 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
     private var page = 1
     private var catIndex = 0
 
-    override fun onCellClickListener(data: Article) {
+    override fun onArticleClickListener(data: Article) {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(data.link))
         startActivity(browserIntent)
     }
@@ -44,7 +44,7 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
         setContentView(R.layout.activity_headlines)
         setTitle(R.string.top_headlines)
 
-        nextButton = findViewById(R.id.next_button)
+        nextButton = findViewById(R.id.skip_button)
         prevButton = findViewById(R.id.prev_button)
         currentPage = findViewById(R.id.current_page)
         prevButton.isEnabled = false
@@ -70,6 +70,8 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
         nextButton.setOnClickListener {
             page += 1
             prevButton.isEnabled = true
+            if (page == 5)
+                nextButton.isEnabled = false
             currentPage.setText(getString(R.string.current_page, page.toString()))
             updateResults()
         }
@@ -81,7 +83,6 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
                 prevButton.isEnabled = false
             currentPage.setText(getString(R.string.current_page, page.toString()))
             updateResults()
-
         }
 
         currentPage.setText(getString(R.string.current_page, page.toString()))
@@ -117,7 +118,7 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
             val articles: List<Article> = newsManager.retrieveHeadlines(apiKey, categories[catIndex], page)
             runOnUiThread {
                 if (articles.isNotEmpty()) {
-                    recyclerView = findViewById(R.id.sources_recycler_viewer)
+                    recyclerView = findViewById(R.id.results_recycler_viewer)
 
                     // Sets scrolling direction to vertical
                     recyclerView.layoutManager = LinearLayoutManager(this@HeadlinesActivity)
@@ -127,7 +128,6 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
                     recyclerView.adapter = adapter
                     Log.d("HeadlinesActivity", "Updating recycler view")
                 } else {
-                    page -= 1
                     val toast = Toast.makeText(
                         this@HeadlinesActivity,
                         "No more results found.",
