@@ -71,6 +71,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        headlinesButton.setOnClickListener {
+            val intent = Intent(this, HeadlinesActivity::class.java)
+
+            startActivity(intent)
+        }
+
         searchTerm.addTextChangedListener(textWatcher)
 
     }

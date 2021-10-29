@@ -14,4 +14,9 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="geocoder_no_results">No results for location!</string>
     <string name="map_query_title">Results for %1$s</string>
+    <string name="next_button">Next Page</string>
+    <string name="prev_button">Prev Page</string>
+    <string name="current_page">Page %1$s</string>
+    <string name="headlines_results">Results</string>
+    <string name="top_headlines">Top Headlines</string>
 </resources>
