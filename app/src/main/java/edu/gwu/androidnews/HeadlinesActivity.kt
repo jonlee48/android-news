@@ -116,6 +116,7 @@ class HeadlinesActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
             Log.d("HeadlinesActivity", "Retrieving sources on ${categories[catIndex]}")
 
             val articles: List<Article> = newsManager.retrieveHeadlines(apiKey, categories[catIndex], page)
+
             runOnUiThread {
                 if (articles.isNotEmpty()) {
                     recyclerView = findViewById(R.id.results_recycler_viewer)

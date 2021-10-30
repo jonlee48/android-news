@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.content.Intent
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -75,14 +72,22 @@ class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener, 
 
             val sources: List<Source> = newsManager.retrieveSources(apiKey, categories[p2])
             runOnUiThread {
-                recyclerView = findViewById(R.id.results_recycler_viewer)
+                if (sources.isNotEmpty()) {
+                    recyclerView = findViewById(R.id.results_recycler_viewer)
 
-                // Sets scrolling direction to vertical
-                recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                    // Sets scrolling direction to vertical
+                    recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
 
-                val adapter = SourceAdapter(this@SourceActivity, sources, this@SourceActivity)
-                recyclerView.adapter = adapter
-                Log.d("SourceActivity", "Updating recycler view")
+                    val adapter = SourceAdapter(this@SourceActivity, sources, this@SourceActivity)
+                    recyclerView.adapter = adapter
+                    Log.d("SourceActivity", "Updating recycler view")
+                } else {
+                    Toast.makeText(
+                        this@SourceActivity,
+                        getString(R.string.no_sources),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }

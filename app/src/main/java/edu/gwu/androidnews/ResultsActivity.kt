@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,14 +35,27 @@ class ResultsActivity : AppCompatActivity(), ArticleClickListener {
                 if (query != null && id != null) {
                     articles = newsManager.retrieveArticles(apiKey, query, id)
                     runOnUiThread {
-                        recyclerView = findViewById(R.id.results_recycler_viewer)
+                        if (articles.isNotEmpty()) {
+                            recyclerView = findViewById(R.id.results_recycler_viewer)
 
-                        // Sets scrolling direction to vertical
-                        recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
+                            // Sets scrolling direction to vertical
+                            recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
 
-                        Log.d("ResultsActivity", "Retrieving articles from $query")
-                        val adapter = ArticlesAdapter(this@ResultsActivity, articles, this@ResultsActivity)
-                        recyclerView.adapter = adapter
+                            Log.d("ResultsActivity", "Retrieving articles from $query")
+                            val adapter = ArticlesAdapter(
+                                this@ResultsActivity,
+                                articles,
+                                this@ResultsActivity
+                            )
+                            recyclerView.adapter = adapter
+                        } else {
+                            val toast = Toast.makeText(
+                                this@ResultsActivity,
+                                getString(R.string.no_results),
+                                Toast.LENGTH_LONG
+                            )
+                            toast.show()
+                        }
                     }
                 }
             } else {
@@ -52,20 +66,31 @@ class ResultsActivity : AppCompatActivity(), ArticleClickListener {
                     Log.d("ResultsActivity", "Generic search2")
                     articles = newsManager.retrieveArticles(apiKey, query)
                     runOnUiThread {
-                        recyclerView = findViewById(R.id.results_recycler_viewer)
+                        if (articles.isNotEmpty()) {
+                            recyclerView = findViewById(R.id.results_recycler_viewer)
 
-                        // Sets scrolling direction to vertical
-                        recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
+                            // Sets scrolling direction to vertical
+                            recyclerView.layoutManager = LinearLayoutManager(this@ResultsActivity)
 
-                        Log.d("ResultsActivity", "Retrieving articles from $query")
-                        val adapter = ArticlesAdapter(this@ResultsActivity, articles, this@ResultsActivity)
-                        recyclerView.adapter = adapter
+                            Log.d("ResultsActivity", "Retrieving articles from $query")
+                            val adapter = ArticlesAdapter(
+                                this@ResultsActivity,
+                                articles,
+                                this@ResultsActivity
+                            )
+                            recyclerView.adapter = adapter
+                        } else {
+                            val toast = Toast.makeText(
+                                this@ResultsActivity,
+                                getString(R.string.no_results),
+                                Toast.LENGTH_LONG
+                            )
+                            toast.show()
+                        }
                     }
                 }
             }
         }
-
-
     }
 
     override fun onArticleClickListener(data: Article) {

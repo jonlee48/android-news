@@ -1,6 +1,8 @@
 package edu.gwu.androidnews
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
@@ -22,7 +24,7 @@ import org.jetbrains.anko.doAsync
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ArticleClickListener {
 
-    private lateinit var mMap: GoogleMap
+    //private lateinit var mMap: GoogleMap
     private lateinit var recyclerView: RecyclerView
     private lateinit var binding: ActivityMapsBinding
     private var currentAddress: Address? = null
@@ -45,6 +47,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ArticleClickListen
         mapFragment.getMapAsync(this)
 
         setTitle(R.string.map_title)
+
     }
 
 
@@ -58,86 +61,108 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ArticleClickListen
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        //mMap = googleMap
+
+        val preferences: SharedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+        val lat = preferences.getString("LAT","")
+        val long = preferences.getString("LONG","")
+        val savedLocation = preferences.getString("LOCATION","")
+        if (!lat.isNullOrBlank() && !long.isNullOrBlank()) {
+            val coords = LatLng(lat.toDouble(), long.toDouble())
+            updateMap(coords, googleMap)
+        }
+
 
         googleMap.setOnMapLongClickListener { coords: LatLng ->
             googleMap.clear()
+            updateMap(coords, googleMap)
+        }
+    }
 
-            // Geocoding should be done on a background thread - it involves networking
-            // and has the potential to cause the app to freeze (Application Not Responding error)
-            // if done on the UI Thread and it takes too long.
-            doAsync {
-                val geocoder = Geocoder(this@MapsActivity)
+    fun updateMap(coords: LatLng, googleMap: GoogleMap) {
+        val preferences: SharedPreferences = getSharedPreferences("android-news", Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.putString("LAT", coords.latitude.toString())
+        editor.putString("LONG", coords.longitude.toString())
 
-                // In Kotlin, you can assign the result of a try-catch block. Both the "try" and
-                // "catch" clauses need to yield a valid value to assign.
-                val results: List<Address> = try {
-                    geocoder.getFromLocation(coords.latitude, coords.longitude, 10)
-                } catch (exception: Exception) {
-                    // Uses the error logger to print the error
-                    Log.e("MapsActivity", "Geocoding failed", exception)
+        editor.apply()
 
-                    // Uses System.out.println to print the error
-                    exception.printStackTrace()
+        // Geocoding should be done on a background thread - it involves networking
+        // and has the potential to cause the app to freeze (Application Not Responding error)
+        // if done on the UI Thread and it takes too long.
+        doAsync {
+            val geocoder = Geocoder(this@MapsActivity)
 
-                    listOf()
+            // In Kotlin, you can assign the result of a try-catch block. Both the "try" and
+            // "catch" clauses need to yield a valid value to assign.
+            val results: List<Address> = try {
+                geocoder.getFromLocation(coords.latitude, coords.longitude, 10)
+            } catch (exception: Exception) {
+                // Uses the error logger to print the error
+                Log.e("MapsActivity", "Geocoding failed", exception)
+
+                // Uses System.out.println to print the error
+                exception.printStackTrace()
+
+                listOf()
+            }
+            // Move back to the UI Thread now that we have some results to show.
+            // The UI can only be updated from the UI Thread.
+            runOnUiThread {
+                if (results.isNotEmpty()) {
+                    // Potentially, we could show all results to the user to choose from,
+                    // but for our usage it's sufficient enough to just use the first result.
+                    // The Geocoder's first result is often the "best" one in terms of its accuracy / confidence.
+                    val firstResult: Address = results[0]
+                    val postalAddress: String = firstResult.getAddressLine(0)
+
+                    Log.d("MapsActivity", "First result: $postalAddress")
+
+                    // Add a map marker where the user tapped and pan the camera over
+
+                    googleMap.addMarker(
+                        MarkerOptions().position(coords).title(postalAddress)
+                    )
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
+
+                    currentAddress = firstResult
+
+                    if (firstResult.getCountryCode() == "US")
+                        location = firstResult.getAdminArea()
+                    else
+                        location = firstResult.getCountryName()
+
+                    setTitle(getString(R.string.map_query_title, location))
+                } else {
+                    Log.d("MapsActivity", "No results from geocoder!")
+
+                    val toast = Toast.makeText(
+                        this@MapsActivity,
+                        getString(R.string.geocoder_no_results),
+                        Toast.LENGTH_LONG
+                    )
+                    toast.show()
                 }
-                // Move back to the UI Thread now that we have some results to show.
-                // The UI can only be updated from the UI Thread.
-                runOnUiThread {
-                    if (results.isNotEmpty()) {
-                        // Potentially, we could show all results to the user to choose from,
-                        // but for our usage it's sufficient enough to just use the first result.
-                        // The Geocoder's first result is often the "best" one in terms of its accuracy / confidence.
-                        val firstResult: Address = results[0]
-                        val postalAddress: String = firstResult.getAddressLine(0)
 
-                        Log.d("MapsActivity", "First result: $postalAddress")
+                doAsync {
+                    val newsManager = NewsManager()
 
-                        // Add a map marker where the user tapped and pan the camera over
+                    // make call to news API
+                    val apiKey = getString(R.string.news_api_key)
+                    Log.d("MapsActivity", "Retrieving articles from $location")
+                    val articles: List<Article> =
+                        newsManager.retrieveArticlesInTitle(apiKey, location)
 
-                        googleMap.addMarker(
-                            MarkerOptions().position(coords).title(postalAddress)
-                        )
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coords, 10.0f))
+                    runOnUiThread {
 
-                        currentAddress = firstResult
+                        recyclerView = findViewById(R.id.maps_recycler_view)
 
-                        if (firstResult.getCountryCode() == "US")
-                            location = firstResult.getAdminArea()
-                        else
-                            location = firstResult.getCountryName()
+                        // Sets scrolling direction to vertical
+                        recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity)
 
-                        setTitle(getString(R.string.map_query_title, location))
-                    } else {
-                        Log.d("MapsActivity", "No results from geocoder!")
-
-                        val toast = Toast.makeText(
-                            this@MapsActivity,
-                            getString(R.string.geocoder_no_results),
-                            Toast.LENGTH_LONG
-                        )
-                        toast.show()
-                    }
-
-                    doAsync {
-                        val newsManager = NewsManager()
-
-                        // make call to news API
-                        val apiKey = getString(R.string.news_api_key)
-                        Log.d("MapsActivity", "Retrieving articles from $location")
-                        val articles: List<Article> = newsManager.retrieveArticlesInTitle(apiKey, location)
-
-                        runOnUiThread {
-
-                            recyclerView = findViewById(R.id.maps_recycler_view)
-
-                            // Sets scrolling direction to vertical
-                            recyclerView.layoutManager = LinearLayoutManager(this@MapsActivity)
-
-                            val adapter = ArticlesAdapter(this@MapsActivity, articles, this@MapsActivity)
-                            recyclerView.adapter = adapter
-                        }
+                        val adapter =
+                            ArticlesAdapter(this@MapsActivity, articles, this@MapsActivity)
+                        recyclerView.adapter = adapter
                     }
                 }
             }

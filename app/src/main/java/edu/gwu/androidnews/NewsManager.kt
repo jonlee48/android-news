@@ -2,6 +2,7 @@ package edu.gwu.androidnews
 
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -30,9 +31,9 @@ class NewsManager {
         val articles: MutableList<Article> = mutableListOf()
         var url = ""
         if (source.isBlank()) {
-            url = "https://newsapi.org/v2/everything?q=$query&apiKey=$apiKey"
+            url = "https://newsapi.org/v2/everything?language=en&q=$query&apiKey=$apiKey"
         } else {
-            url = "https://newsapi.org/v2/everything?sources=$source&q=$query&apiKey=$apiKey"
+            url = "https://newsapi.org/v2/everything?language=en&sources=$source&q=$query&apiKey=$apiKey"
         }
         val request: Request = Request.Builder()
             .url(url)
@@ -117,7 +118,7 @@ class NewsManager {
         val articles: MutableList<Article> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/top-headlines?category=$category&page=$page&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/top-headlines?country=us&category=$category&page=$page&apiKey=$apiKey")
             .build()
 
         val response: Response = okHttpClient.newCall(request).execute()
@@ -157,7 +158,7 @@ class NewsManager {
         val sources: MutableList<Source> = mutableListOf()
 
         val request: Request = Request.Builder()
-            .url("https://newsapi.org/v2/top-headlines/sources?category=$category&apiKey=$apiKey")
+            .url("https://newsapi.org/v2/top-headlines/sources?language=en&category=$category&apiKey=$apiKey")
             .build()
         Log.d("MapsActivity", "set get https request")
 
