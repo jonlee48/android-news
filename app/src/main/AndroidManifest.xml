@@ -37,6 +37,12 @@
             android:name=".SourceActivity"
             android:exported="true" />
         <activity
+            android:name=".HeadlinesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ResultsActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

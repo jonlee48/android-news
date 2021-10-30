@@ -4,20 +4,19 @@ import android.os.Bundle
 import android.content.Intent
 import android.util.Log
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import org.jetbrains.anko.doAsync
 
-class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener, SourceClickListener {
 
     private lateinit var spinner: Spinner
     private lateinit var recyclerView: RecyclerView
+    private lateinit var skipButton: Button
 
-    val categories  = arrayOf(
+    private val categories = arrayOf(
         "Business",
         "Entertainment",
         "General",
@@ -26,6 +25,8 @@ class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         "Sports",
         "Technology"
     )
+    private var category = categories[0]
+    private var term: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +34,13 @@ class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         // Get the search term from the intent key-value pair
         val intent: Intent = getIntent()
-        val term: String? = intent.getStringExtra("TERM")
+        val temp: String? = intent.getStringExtra("TERM")
+        if (temp != null)
+            term = temp
         val title = getString(R.string.source_title, term)
         setTitle(title)
+
+        skipButton = findViewById(R.id.skip_button)
 
         // Setup spinner
         spinner = findViewById(R.id.spinner)
@@ -45,10 +50,18 @@ class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         spinner.setSelection(0)
         spinner.onItemSelectedListener = this
+
+        skipButton.setOnClickListener {
+            val intent: Intent = Intent( this, ResultsActivity::class.java)
+            intent.putExtra("CATEGORY", category)
+            intent.putExtra("QUERY", term)
+            startActivity(intent)
+        }
     }
 
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+        category = categories[p2]
         //make API call
         doAsync {
             val newsManager = NewsManager()
@@ -59,14 +72,22 @@ class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
             val sources: List<Source> = newsManager.retrieveSources(apiKey, categories[p2])
             runOnUiThread {
-                recyclerView = findViewById(R.id.sources_recycler_viewer)
+                if (sources.isNotEmpty()) {
+                    recyclerView = findViewById(R.id.results_recycler_viewer)
 
-                // Sets scrolling direction to vertical
-                recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
+                    // Sets scrolling direction to vertical
+                    recyclerView.layoutManager = LinearLayoutManager(this@SourceActivity)
 
-                val adapter = SourceAdapter(sources)
-                recyclerView.adapter = adapter
-                Log.d("SourceActivity", "Updating recycler view")
+                    val adapter = SourceAdapter(this@SourceActivity, sources, this@SourceActivity)
+                    recyclerView.adapter = adapter
+                    Log.d("SourceActivity", "Updating recycler view")
+                } else {
+                    Toast.makeText(
+                        this@SourceActivity,
+                        getString(R.string.no_sources),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
@@ -74,53 +95,11 @@ class SourceActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(p0: AdapterView<*>?) {
     }
 
-    fun generateFakeSource(): List<Source> {
-        return listOf(
-            Source(
-                name="ACB News",
-                description="Description of ABC News. Blah blah blah."
-            ),
-            Source(
-                name="Business Insider",
-                description="Description of Business Insider. Blah blah blah."
-            ),
-            Source(
-                name="CNN",
-                description="Description of CNN. Blah blah blah."
-            ),
-            Source(
-                name="Fox News",
-                description="Description of Fox News. Blah blah blah."
-            ),
-            Source(
-                name="Guardian",
-                description="Description of Guardian. Blah blah blah."
-            ),
-            Source(
-                name="Huffington Post",
-                description="Description of Huffington Post. Blah blah blah."
-            ),
-            Source(
-                name="Los Angeles Times",
-                description="Description of Los Angeles Times. Blah blah blah."
-            ),
-            Source(
-                name="Politico",
-                description="Description of Politico. Blah blah blah."
-            ),
-            Source(
-                name="Star Gazette",
-                description="Description of Star Gazette. Blah blah blah."
-            ),
-            Source(
-                name="The New York Times",
-                description="Description of The New York Times. Blah blah blah."
-            ),
-            Source(
-                name="Wall Street Journal",
-                description="Description of Wall Street Journal. Blah blah blah."
-            ),
-        )
+    override fun onSourceClickListener(data: Source) {
+        val intent: Intent = Intent( this, ResultsActivity::class.java)
+        intent.putExtra("SOURCE_ID", data.id)
+        intent.putExtra("SOURCE_NAME", data.name)
+        intent.putExtra("QUERY", term)
+        startActivity(intent)
     }
-
 }

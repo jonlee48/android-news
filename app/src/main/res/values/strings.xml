@@ -13,5 +13,15 @@
     <string name="source_title">Search for %1$s</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="geocoder_no_results">No results for location!</string>
+    <string name="no_results">No results found.</string>
+    <string name="no_sources">No sources found.</string>
     <string name="map_query_title">Results for %1$s</string>
+    <string name="next_button">Next Page</string>
+    <string name="prev_button">Prev Page</string>
+    <string name="current_page">Page %1$s of 5</string>
+    <string name="headlines_results">Results</string>
+    <string name="top_headlines">Top Headlines</string>
+    <string name="results_title_source">%1$s results for %2$s</string>
+    <string name="results_title">Results for %1$s</string>
+
 </resources>
